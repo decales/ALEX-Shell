@@ -1,7 +1,7 @@
 (load "input.lsp")
 
 
-(defun printShellStr ()
+(defun printShell ()
   (format t "fexsh>> ")
 )
 
@@ -60,7 +60,7 @@
 
          (let ((filepath (nth 1 tokens)))
            (if filepath
-             (readInput)
+             (readInput filepath)
              (format t "error - 'input' must be followed by the path of the file to be read~%")
             )
           )
@@ -80,12 +80,8 @@
 (printCommands)
 
 (loop while shellRunning do
-
-  (printShellStr)
-
+  (printShell)
   (let ((tokens (getTokens)))
     (getCommand tokens)
   )
 )
-
-

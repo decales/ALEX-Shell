@@ -6,7 +6,7 @@
 
 (load "solve.lsp")
 
+(defun parseInput(line)
 
-(defun parseInput()
-  (solveProblem)
+
 )
