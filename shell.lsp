@@ -2,27 +2,29 @@
 
 
 (defun printShell ()
-  (format t "fexsh>> ")
+  (format t "alexsh>> ")
 )
 
 
 (defun printAbout()
-  (format t "    __               _
-   / _|             | |    
-  | |_ _____  _____ | |__  
-  |  _/ _ \\ \\/ / __|| '_ \\ 
-  | ||  __/>  <\\__ \\| | | |
-  |_| \\___/_/\\_\\___/|_| |_|
-  ")
-  (format t "~%Welcome to the farmer-problem expert system shell~%")
+
+  (format t "     _   _    _____  __
+    /_\\ | |  | __\\ \\/ /
+   / _ \\| |__| _| >  < 
+  /_/ \\_\\____|___/_/\\_\\
+  ")         
+
+  (format t "~%Welcome to 'a LISP expert-system' shell~%")
   (format t "Created by Declan Urbaniak-Dornstauder for COMP 452~%~%")
 )
 
 
 (defun printCommands()
-   (format t "List of available commands:~%")
-   (format t "  'quit' or 'q' ------- terminate the current session~%")
-   (format t "  'help' or 'h' ------- print information about this shell and the list of valid commands~%")
+   (format t "List of commands:~%")
+   (format t "  'quit' or 'q' -------------------------- terminate the current session~%")
+   (format t "  'help' or 'h' -------------------------- print information about this shell and the list of commands~%")
+   (format t "  'input <file>' or 'i <file>' ----------- input and load a knowledge-base file~%")
+   (format t "  'start' or 's' ------------------------- print all solutions given the current knowledge-base~%")
 )
 
 
@@ -55,18 +57,24 @@
         ((or (string= command "help") (string= command "h"))
          (printCommands)
         )
-        ;; input 
+        ;; input knowledge-base 
         ((or (string= command "input") (string= command "i"))
-
          (let ((filepath (nth 1 tokens)))
            (if filepath
              (readInput filepath)
-             (format t "error - 'input' must be followed by the path of the file to be read~%")
+             (format t "error - 'input' must be followed by the path of the knowledge-base file to be read~%")
             )
           )
         )
+        ;; solve problem
+        ((or (string= command "start") (string= command "s"))
+         (if knowledgeBaseRead
+           ()
+           (format t "error - no knowledge-base is currently loaded - use 'input <file>' to input and load a knowledge-base file~%" command)
+         )
+        )
         (t ;; default - command not recognized
-          (format t "~s is not a valid command - use 'help' or 'h' for a list of valid commands~%" command)
+          (format t "error - ~s is not a valid command - use 'help' or 'h' for a list of valid commands~%" command)
         )
       )
     )
@@ -75,6 +83,7 @@
 
 
 (defvar shellRunning t)
+(defvar knowledgeBaseRead nil)
 
 (printAbout)
 (printCommands)
