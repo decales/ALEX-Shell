@@ -7,7 +7,6 @@
 
 
 (defun printAbout()
-
   (format t "     _   _    _____  __
     /_\\ | |  | __\\ \\/ /
    / _ \\| |__| _| >  < 
@@ -82,15 +81,16 @@
 )
 
 
-(defvar shellRunning t)
-(defvar knowledgeBaseRead nil)
-
-(printAbout)
-(printCommands)
-
-(loop while shellRunning do
-  (printShell)
-  (let ((tokens (getTokens)))
-    (getCommand tokens)
-  )
-)
+;; (defvar shellRunning t)
+;; (defvar knowledgeBaseRead nil)
+;;
+;; (printAbout)
+;; (printCommands)
+;;
+;; (loop while shellRunning do
+;;   (printShell)
+;;   (let ((tokens (getTokens)))
+;;     (getCommand tokens)
+;;   )
+;; )
+(readInput "fp.lsp")

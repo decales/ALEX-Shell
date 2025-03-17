@@ -1,62 +1,37 @@
-;; Customizable struct to represent a state in the context of the problem to be solved
-;; You can declare as many state properties as you like and name them as you please
-(defstruct state
-  farmer
-  wolf
-  goat
-  cabbage
-)
+
+;; State definition
+;; - define a list of pairs ((<property-name> <property-data-type>) ... ) to specify the properties required to represent a state of the problem instance
+;; - you may define as many properties as you like, name them as you please, and use the data type from (boolean bit string character integer float)
+;; - ex. ((a boolean) (b integer) (c string))
+((farmer boolean) (wolf boolean) (goat boolean) (cabbage boolean))
+
 
 ;; Initial state
-;; You must define all properties of the custom state struct
-(defvar initial
-  (make-state
-    :farmer t
-    :wolf t
-    :goat t
-    :cabbage t
-  )
-)
+;; - define a list of pairs ((<property-name> <property-initial-value>) ... ) for each property in the state definition using its appropriate data type
+;; - ex. ((a t) (b 1) (c "hello"))
+((wolf nil) (farmer nil) (cabbage nil) (goat nil)  )
+
 
 ;; Goal state
-;; You must define all properties of the custom state struct
-(defvar goal
-  (make-state
-    :farmer nil
-    :wolf nil
-    :goat nil
-    :cabbage nil
+;; - define a list of pairs ((<property-name> <property-goal-value>) ... ) for each property in the state definition using its appropriate data type
+;; - ex. ((a nil) (b 0) (c "goodbye"))
+((cabbage t) (goat t) (wolf t) (farmer t))
+
+
+;; Production-rules
+;; - define a list of production sublists where each sublist must define the four parameters in the following order:
+;;    - condition-semantics: string expression that semantically describes the logic of the 'condition' in the context of the problem instance
+;;    - condition: boolean expression that logically represents the constraints of the 'action', and may use the state definition properties
+;;    - action-semantics: string expression that semantically describes the 'action' in the context of the problem instance
+;;    - action: list of pairs ((<property-name> (<new-property-value>)) ... ) to represent the updated state using the state definition properties
+;;      - you need only to specify the properties that should be updated - those not specified will maintain their value in the updated state
+;; - in addition to the state properties, the 'condition' and 'action' may use any Common Lisp functionality given they conform to their expected formats
+;; - it is your responsibility to ensure all expressions are both syntactically correct and safe to evaluate
+(
+  (
+    "wolf and goat are not together and goat and cabbage are not together"
+    (and (not (xor wolf goat))  (not (xor goat cabbage)))
+    "farmer crosses to other side of river alone"
+    ((farmer (not farmer)))
   )
 )
-
-;; List of production rules (condition-action pairs)
-;; - Production rules are represented as instances of the non-customizable struct 'production-rule'
-;; - You can define as many production rules as you like by inserting a 'make-production-rule' block in the 'production-rules' list below
-;; - Each 'production-rule' instance should have the following properties:
-;;    - condition-semantics:  string that semantically describes the logic of the 'condition' in the context of the problem
-;;    - condition:            lambda function containing boolean expression to represent the constraints of an 'action'
-;;    - action-semantics:     string that semantically describes the function of the 'action' in the context of the problem
-;;    - action:               lambda function containing expression to update the "knowledge" of the program or the current state
-;; - 'condition' and 'action' must take the form of a lambda function with one parameter 's' of type 'state' to represent the current state
-;; - Therefore, the expression inside a lambda function can access the custom properties of 's' as defined in the 'state' struct in this file
-;; - 'condition' expressions must evaluate to a boolean representing whether the current state 's' has met the conditions to fire an action
-;; - 'action' expressions must evaluate to a 'state' instance that represents the new state after an action has occured in the current state 's'
-;; - In general, it is your responsibilty to ensure that an expression...
-;;    - consists of valid Lisp syntax
-;;    - aligns with the data types and names of the properties defined in the custom state struct 
-;;    - is correct in the context of the problem to be solved
-;;    - does not compromise the safety and security of your system (due to its ambiguity, and whether intentional or not)
-(defvar production-rules
-
-  (make-production-rule
-    :condition-semantics "wolf and goat are not together and goat and cabbage are not together"
-    :condition (lambda (s) (and (not (xand (state-wolf s) (state-goat s))) (not (xand (state-goat s) (state-cabbage s)))))
-    :action-semantics "farmer travels alone to opposite shore"
-    :action (lambda (s) (setf (state-farmer s) (not (state-farmer s))))
-  )
-
-  ;; ... add rest of production-rules later
-)
-
-
-

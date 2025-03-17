@@ -1,6 +1,6 @@
 (defpackage solve
   (:use :cl)
-  (:export :readInput)
+  (:export :solveProblem)
 )
 
 

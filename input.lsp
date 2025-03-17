@@ -10,11 +10,10 @@
 (defun readInput(filepath)
   ;; check if the file exists
   (if (probe-file filepath)
-    (progn
+    ;; read each expression from the inputted file into a list then pass list of expressions to parser 
+    (parseExpressions
       (with-open-file (stream filepath :direction :input)
-        (loop while (setq line (read-line stream nil)) do
-          (parseInput line)
-        )
+        (loop for expression = (read stream nil 'eof) until (eq expression 'eof) collect expression)
       )
     )
     (format t "error - the file ~s does not exist or could not read~%" filepath)
