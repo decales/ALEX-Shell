@@ -7,13 +7,13 @@
 
 
 ;; Initial state
-;; - define a list of pairs ((<property-name> <property-initial-value>) ... ) for each property in the state definition using its appropriate data type
+;; - define a list of pairs ((<property-name> <property-goal-value>) ... ) for each state definition property using its name and a value of its data type
 ;; - ex. ((a t) (b 1) (c "hello"))
-((wolf nil) (farmer nil) (cabbage nil) (goat nil)  )
+((wolf nil) (farmer nil) (cabbage nil) (goat nil))
 
 
 ;; Goal state
-;; - define a list of pairs ((<property-name> <property-goal-value>) ... ) for each property in the state definition using its appropriate data type
+;; - define a list of pairs ((<property-name> <property-goal-value>) ... ) for each state definition property using its name and a value of its data type
 ;; - ex. ((a nil) (b 0) (c "goodbye"))
 ((cabbage t) (goat t) (wolf t) (farmer t))
 
@@ -26,12 +26,11 @@
 ;;    - action: list of pairs ((<property-name> (<new-property-value>)) ... ) to represent the updated state using the state definition properties
 ;;      - you need only to specify the properties that should be updated - those not specified will maintain their value in the updated state
 ;; - in addition to the state properties, the 'condition' and 'action' may use any Common Lisp functionality given they conform to their expected formats
+;; - 'xand' and 'xor' are both internally defined to simplify expressions 
 ;; - it is your responsibility to ensure all expressions are both syntactically correct and safe to evaluate
 (
-  (
-    "wolf and goat are not together and goat and cabbage are not together"
-    (and (not (xor wolf goat))  (not (xor goat cabbage)))
-    "farmer crosses to other side of river alone"
-    ((farmer (not farmer)))
-  )
+ ("wolf and goat are not together and goat and cabbage are not together"
+  (and (xor wolf goat) (xor goat cabbage))
+  "farmer crosses to other side of river alone"
+  nil)
 )
