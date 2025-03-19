@@ -3,7 +3,6 @@
 ;; global shell variables
 (defvar shellRunning t)
 
-
 (defun msgPrompt()
   (format t "~%(alexsh)$ ")
 )
@@ -24,10 +23,10 @@
   (msg 'info nil "list of commands")
   (msg nil nil 
      "~2T'quit' or 'q' -------------------------- terminate the current session~
-     ~%~2T'help' or 'h' -------------------------- print information about this shell and the list of msgCommands~
-     ~%~2T'input <file>' or 'i <file>' ----------- input and load a knowledge-base readFile~
-     ~%~2T'start' or 's' ------------------------- start the inference engine with the provided knowledge-base file~
-     ~%~2T'file' or 'f' -------------------------- view the properties of the provided knowledge-base file"
+     ~%~2T'help' or 'h' -------------------------- print information about this shell and the list of commands~
+     ~%~2T'input <file>' or 'i <file>' ----------- input and load a knowledge-base file~
+     ~%~2T'start' or 's' ------------------------- start the inference engine with the current knowledge-base~
+     ~%~2T'file' or 'f' -------------------------- view the properties of the current knowledge-base"
   )
 )
 
@@ -143,13 +142,16 @@
 
 
 (defun startShell()
-  (msgAbout)
-  (msgCommands)
+  (readFile "fp.lsp")
+  (when knowledgeBaseLoaded (startEngine))
 
-  (loop while shellRunning do
-    (msgPrompt)
-    (let ((tokens (getTokens)))
-      (getCommand tokens)
-    )
-  )
+  ;; (msgAbout)
+  ;; (msgCommands)
+  ;;
+  ;; (loop while shellRunning do
+  ;;   (msgPrompt)
+  ;;   (let ((tokens (getTokens)))
+  ;;     (getCommand tokens)
+  ;;   )
+  ;; )
 )
