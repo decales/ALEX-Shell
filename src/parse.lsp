@@ -8,8 +8,9 @@
 (defparameter knowledgeBaseLoaded nil)
 
 ;; parse-specific variables
-(defvar typeSpecifiers '(boolean bit string character integer float))
 (defvar errorsDetected nil)
+(defvar typeSpecifiers
+  '(boolean bit string simple-string character char standard-char base-char integer fixnum bignum float short-float single-float double-float long-float))
 
 
 (defun parseExpressions(read-expressions)
@@ -23,9 +24,9 @@
   (if (and stateDefinition initialState goalState productionRules (not errorsDetected))
     (progn
       (setf knowledgeBaseLoaded t) ;; signal to shell module that inputted knowledge-base is valid
-      (msg 'info nil "knowledge-base file read successfully")
+      (msg 'info nil "knowledge-base file read and loaded successfully")
       (msg 'info nil "use 'start' or 's' to start the inference engine with the provided knowledge-base")
-      (msg 'info nil "use 'file' or 'f' to view the properties of the provided knowledge-base")
+      (msg 'info nil "use 'info' or 'i' to view the properties of the provided knowledge-base")
     )
     (msg 'info nil "aborting current knowledge-base input")
   )
@@ -56,9 +57,10 @@
               ;; check if second expression is a data type specifier
               (loop for typeS in typeSpecifiers while (not typeValid) do (setf typeValid (eq typeS type)))
               (unless typeValid
-                (msg 'error property "state definition - second expression of property must be a type-specifier symbol ~s" `',typeSpecifiers)
+                (msg 'error property "state definition - second expression of property must be a type-specifier symbol ~s" 
+                  `'(boolean bit string character integer float))
               )
-              ;; when name and type are valid, create global variable for property and push it to state definition
+              ;; when name and type are valid, create global variable for property and push it to stat?e definition
               (when (and nameValid typeValid)
                 (setf stateDefinition (cons `(,name ,type) stateDefinition))
               )
@@ -104,7 +106,6 @@
                   ;; check if second expression is a value that matches the expected data type of the given property
                   (if (typep value type)
                     ;; save property name and value
-                    ;; (eval `(setf ,state (cons ',property ,state)))
                     (eval `(setf ,state (cons '(,name ,value) ,state)))
                     (msg 'error property "~a - expected ~a expression value for ~a property" stateString (string type) (string name))
                   )

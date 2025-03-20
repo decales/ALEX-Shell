@@ -33,7 +33,7 @@
 
         ;; create dynamically scoped variables for each property of the current state, then match them to production rules
         ;; vars are dynamic in that they are bound in the let block scope, but 'special' declaration allows them to be used with (eval) outside of it
-        ;; this language is simulatenously crazy and amazing, but this was a nightmare to figure out
+        ;; this language is incredible, but this was a nightmare to figure out
         (eval `(let ,state 
           (declare (special ,@(mapcar #'first state)))
 

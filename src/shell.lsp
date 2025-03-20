@@ -1,6 +1,7 @@
 (in-package alex-shell)
 
 (defvar shellRunning t)
+(defvar lastFileInputted nil)
 
 
 (defun msgPrompt()
@@ -15,7 +16,7 @@
    / _ \\| |__| _| >  < 
   /_/ \\_\\____|___/_/\\_\\
   ")         
-  (msg 'info nil "Welcome to \"a LISP expert-system\" shell - created by Declan Urbaniak-Dornstauder for COMP 452")
+  (msg 'info nil "Welcome to \"a LISP expert-system\" shell - created by Declan Urbaniak-Dornstauder for COMP 456")
 )
 
 
@@ -24,9 +25,10 @@
   (msg nil nil 
      "~2T'quit' or 'q' -------------------------- terminate the current session~
      ~%~2T'help' or 'h' -------------------------- print information about this shell and the list of commands~
-     ~%~2T'input <file>' or 'i <file>' ----------- input and load a knowledge-base file~
-     ~%~2T'start' or 's' ------------------------- start the inference engine with the current knowledge-base~
-     ~%~2T'file' or 'f' -------------------------- view the properties of the current knowledge-base"
+     ~%~2T'load <file>' or 'l <file>' ------------ input and load a knowledge-base file~
+     ~%~2T'reload' or 'r' ------------------------ reload the last knowledge-base file that was inputted~
+     ~%~2T'info' or 'i' -------------------------- view the properties of the current knowledge-base~
+     ~%~2T'start' or 's' ------------------------- start the inference engine with the current knowledge-base"
   )
 )
 
@@ -63,7 +65,7 @@
       (format t "(~a): ~a~%" (string-downcase leader) (eval `(format nil ,str ,@vars)))
     )
     (if input
-      (format t "~a~%~2Tinput: ~s~%" (eval `(format nil ,str ,@vars)) input)
+      (format t "~a~%~1T^^^ input: ~s~%" (eval `(format nil ,str ,@vars)) input)
       (format t "~a~%" (eval `(format nil ,str ,@vars)))
     )
   )
@@ -102,7 +104,7 @@
           (msgCommands)
         )
         ;; input knowledge-base 
-        ((or (string= command "input") (string= command "i"))
+        ((or (string= command "load") (string= command "l"))
           (let ((file (nth 1 tokens)))
             ;; check if a path to a file was included in the command
             (if file
@@ -127,8 +129,17 @@
                 ;; otherwise this is a new session, read the file
                 (readFile file)
               )
-              (msg 'error nil "'input' must be followed by the path of the knowledge-base file to be read")
+              (msg 'error nil "'load' must be followed by the path of the knowledge-base file to be read")
             )
+          )
+        )
+        ((or (string= command "reload") (string= command "r"))
+          (if lastFileInputted
+            (progn
+              (msg 'info nil "reloading ~s" lastFileInputted)
+              (readFile lastFileInputted)
+            )
+            (msg 'error nil "a previous knowledge-base file was not inputted - use 'input <file>' to input and load a knowledge-base file" command)
           )
         )
         ;; start engine
@@ -140,7 +151,7 @@
           )
         )
         ;; knowledge-base file information
-        ((or (string= command "file") (string= command "f"))
+        ((or (string= command "info") (string= command "i"))
           (if knowledgeBaseLoaded
             (msg 'info nil "didn't feel like implementing this command (but trust me, it's all there)")
             
