@@ -69,9 +69,9 @@
           (msg 'error property "state definition - property must be a list in the form (<property-name> <property-type>)")
         )
       )
-      (msg 'error read-initialState "state definition list must not be empty")
+      (msg 'error read-initialState "state definition - state definition list must not be empty")
     )
-    (msg 'error read-initialState "state definition must be a list in the form ((<property-name> <property-type>) ... )")
+    (msg 'error read-initialState "state definition - state definition must be a list in the form ((<property-name> <property-type>) ... )")
   )
 )
 
@@ -94,7 +94,7 @@
       (if (typep property 'list)
         ;; check if property list contains exactly two expressions
         (if (= 2 (length property))
-          (let ((name (nth 0 property)) (value (nth 1 property))  (type (nth 1 (assoc (nth 0 property) stateDefinition))))
+          (let ((name (nth 0 property)) (value (getValue(nth 1 property)))  (type (nth 1 (assoc (nth 0 property) stateDefinition))))
             ;; check if first expression is a non-boolean symbol
             (if (and (typep name 'symbol) (not (typep name 'boolean)))
               ;; check if first expression is a symbol of a name of a property in the state definition
@@ -102,9 +102,10 @@
                 ;; check if property has not already been assigned a value
                 (if (not (eval `(assoc ',name ,state)))
                   ;; check if second expression is a value that matches the expected data type of the given property
-                  (if (isType value type)
+                  (if (typep value type)
                     ;; save property name and value
-                    (eval `(setf ,state (cons ',property ,state)))
+                    ;; (eval `(setf ,state (cons ',property ,state)))
+                    (eval `(setf ,state (cons '(,name ,value) ,state)))
                     (msg 'error property "~a - expected ~a expression value for ~a property" stateString (string type) (string name))
                   )
                   (msg 'error read-state "~a - the value for property ~a must only be set once" stateString (string name))
@@ -141,10 +142,10 @@
         (loop for i below (length read-productionRules) do
           (parseProduction (nth i read-productionRules) (+ 1 i))
         )
-        (msg 'error nil "production rules list must not be empty")
+        (msg 'error nil "production rules - production rules list must not be empty")
       )
       (msg 'error read-productionRules
-        "production rules must be a list in the form ((<condition-semantics> <condition> <action-semantics> <action>) ... )")
+        "production rules - production rules must be a list in the form ((<condition-semantics> <condition> <action-semantics> <action>) ... )")
     )
     (unless errorsDetected
       (setf productionRules read-productionRules)
@@ -164,76 +165,82 @@
             (action (nth 3 production)))
 
         ;; check condition semantics
-        (unless (isType condition-semantics 'string)
-          (msg 'error condition-semantics "production rules - condition semantics of production #~d must be a string expression" index)
+        (unless (typep (getValue condition-semantics) 'string)
+          (msg 'error condition-semantics "production #~d - condition semantics of production must be a string expression" index)
         )
         ;; check action semantics
-        (unless (isType action-semantics 'string)
-          (msg 'error action-semantics "production rules - action semantics of production #~d must be a string expression" index)
+        (unless (typep (getValue action-semantics) 'string)
+          (msg 'error action-semantics "production #~d - action semantics of production must be a string expression" index)
         )
         ;; test if condition and action are are valid using values of initial state to create dynamic local variables for state properties 
-        ;; (this is where things get start to get fucky)
-          (eval `(let ,initialState
-            ;; check condition
-            (handler-case
-              (unless (typep ,condition 'boolean)
-                (msg 'error ',condition "production rules - expected a boolean expression for condition of production #~d" ,index)
-              )
-              (error (e)
-                (msg 'error ',condition 
-                  "production rules - unable to evaluate condition of production #~d - please verify the symbols and syntax " ,index)
-              )
+        (eval `(let ,initialState
+          (declare (special ,@(mapcar #'first initialState)))
+
+          ;; check condition
+          (handler-case
+            (unless (typep ,condition 'boolean)
+              (msg 'error ',condition "production ~#d - expected a boolean expression for condition of production" ,index)
             )
-              ;; check action
-            (if (typep ',action 'list)
-              (loop for property in ',action do
-                ;; check if property is a list
-                (if (typep property 'list)
-                  ;; check if property list has exactly two expression
-                  (if (= 2 (length property))
-                    (let ((name (nth 0 property)) (value (nth 1 property))  (type (nth 1 (assoc (nth 0 property) ',stateDefinition))))
-                      ;; check if first expression is a non-boolean symbol
-                      (if (and (typep name 'symbol) (not (typep name 'boolean)))
-                        ;; check if first expression is a symbol of a name of a property is the state definition
-                        (if (assoc name ',stateDefinition)
-                          ;; check if second expression is a value that matches the expected data type of the given property
-                          (handler-case
-                            (unless (typep value type)
-                              (msg 'error property "production rules - expected ~a expression value for ~a property" (string type) (string name))
-                            )
-                            (error (e)
-                              (msg 'error ',condition 
-                                "production rules - unable to evaluate action of production #~d - please verify the symbols and syntax " ,index)
-                            )
-                          )
-                          (msg 'error property "production rules - a property with the name ~a is not declared in the state definition" (string name))
-                        )
-                        (msg 'error property 
-                          "production rules - property name must be symbol for the name of a property declared in the state definition")
-                      )
-                    )
-                    (msg 'error ',action 
-                      "production rules - expected two expressions (<property-name> <new-property-value>) in action of property #~d but found ~d"
-                       ,index (length property))
-                  )
-                  (msg 'error ',action "production rules - property update must be a list in the form (<property-name> <new-property-value>)")
-                )
-              )
-              (msg 'error ',action "production rules - action must be list in the form ((<property-name> <new-property-value>) ... )")
+            (error (e)
+              (msg 'error ',condition 
+                "production #~d - unable to evaluate condition of production - please verify the symbols and syntax " ,index)
             )
           )
-        )
+            ;; check action
+          (if (typep ',action 'list)
+            (loop for property in ',action do
+              ;; check if property is a list
+              (if (typep property 'list)
+                ;; check if property list has exactly two expression
+                (if (= 2 (length property))
+                  (let ((name (nth 0 property)) (value (getValue (nth 1 property)))  (type (nth 1 (assoc (nth 0 property) ',stateDefinition))))
+                    ;; check if first expression is a non-boolean symbol
+                    (if (and (typep name 'symbol) (not (typep name 'boolean)))
+                      ;; check if first expression is a symbol of a name of a property is the state definition
+                      (if (assoc name ',stateDefinition)
+                        ;; check if second expression is a value that matches the expected data type of the given property
+                        (unless (typep value type)
+                          (msg 'error property 
+                            "production #~d - expected ~a expression value for ~a action property" ,index (string type) (string name))
+                        )
+                        (msg 'error property "production #~d - a property with the name ~a is not declared in the state definition" 
+                          ,index (string name))
+                      )
+                      (msg 'error property 
+                        "production #~d - property name must be symbol for the name of a property declared in the state definition" ,index)
+                    )
+                  )
+                  (msg 'error ',action 
+                    "production #~d - expected two expressions (<property-name> <new-property-value>) in action property but found ~d"
+                     ,index (length property))
+                )
+                (msg 'error ',action "production #~d - property update must be a list in the form (<property-name> <new-property-value>)" ,index)
+              )
+            )
+            (msg 'error ',action "production #~d - action must be list in the form ((<property-name> <new-property-value>) ... )" ,index)
+          )
+        ))
       )
-      (msg 'error nil "production rules - expected 4 parameters in production #~d but found ~d" index (length production))
+      (msg 'error nil "production #~d - expected 4 parameters in production but found ~d" index (length production))
     )
-    (msg 'error property "production rules - production must be a list in the form (<condition-semantics> <condition> <action-semantics> <action>)")
+    (msg 'error property "production #~d - production must be a list in the form (<condition-semantics> <condition> <action-semantics> <action>)" index)
   )
 )
 
 
-(defun isType(expression type)
-  ;; try to evaluate the expression, then check if evaluation matches expected data type
-  (handler-case (typep (eval expression) type) (error (e) (typep expression type)))
+(defun getValue(expression)
+  ;; try to evaluate the expression and return its value
+  (handler-case
+    (return-from getValue (eval expression))
+    (error (e1)
+      (handler-case
+        (return-from getValue expression)
+        (error (e2)
+          (msg 'error expression "I cannot even begin to imagine what you must have inputted to see this message. God save us all.")
+        )
+      )
+    )
+  )
 )
 
 

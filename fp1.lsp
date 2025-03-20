@@ -34,40 +34,72 @@
   "farmer travels with the goat to the East side"
   ((farmer "E") (goat "E")))
 
- ("Farmer, goat, and cabbage are on the West side and wolf is on the East side"
-  (and (string= farmer "W") (string= goat "W") (string= cabbage "W") (string= wolf "E"))
-  "farmer travels with the cabbage to the East side"
-  ((farmer "E") (cabbage "E")))
-
  ("Farmer, goat, and cabbage are on the East side"
   (and (string= farmer "E") (string= goat "E") (string= cabbage "E"))
   "farmer travels with the goat to the West side"
   ((farmer "W") (goat "W")))
+ 
+ ;;
+
+ ("Farmer, goat, and cabbage are on the West side and wolf is on the East side"
+  (and (string= farmer "W") (string= goat "W") (string= cabbage "W") (string= wolf "E"))
+  "farmer travels with the cabbage to the East side"
+  ((farmer "E") (cabbage "E")))
 
  ("Farmer, goat, and cabbage are on the East side and wolf is on the West side"
   (and (string= farmer "E") (string= goat "E") (string= cabbage "E") (string= wolf "W"))
   "farmer travels with the cabbage to the West side"
   ((farmer "W") (cabbage "W")))
 
+ ;;
+
  ("Farmer, wolf, and goat are on the West side and cabbage is on the East side"
   (and (string= farmer "W") (string= wolf "W") (string= goat "W") (string= cabbage "E"))
   "farmer travels with the wolf to the East side"
   ((farmer "E") (wolf "E")))
-
- ("Farmer, wolf, and goat are on the West side"
-  (and (string= farmer "W") (string= wolf "W") (string= goat "W"))
-  "farmer travels with the goat to the East side"
-  ((farmer "E") (goat "E")))
 
  ("Farmer, wolf, and goat are on the East side and cabbage is on the West side"
   (and (string= farmer "E") (string= wolf "E") (string= goat "E") (string= cabbage "W"))
   "farmer travels with the wolf to the West side"
   ((farmer "W") (wolf "W")))
 
+ ;;
+
+ ("Farmer, wolf, and goat are on the West side"
+  (and (string= farmer "W") (string= wolf "W") (string= goat "W"))
+  "farmer travels with the goat to the East side"
+  ((farmer "E") (goat "E")))
+
  ("Farmer, wolf, and goat are on the East side"
   (and (string= farmer "E") (string= wolf "E") (string= goat "E"))
   "farmer travels with the goat to the West side"
   ((farmer "W") (goat "W")))
+
+;;
+
+ ("Farmer, wolf, and cabbage are on the West side and goat is on East side"
+  (and (string= farmer "W") (string= wolf "W") (string= cabbage "W") (string= goat "E"))
+  "farmer travels with the wolf to the East side"
+  ((farmer "E") (wolf "E")))
+
+ ("Farmer, wolf, and cabbage are on the East side and goat is on West side"
+  (and (string= farmer "E") (string= wolf "E") (string= cabbage "E") (string= goat "W"))
+  "farmer travels with the wolf to the West side"
+  ((farmer "W") (wolf "W")))
+
+ ;;
+
+ ("Farmer, wolf, and cabbage are on the West side and goat is on East side"
+  (and (string= farmer "W") (string= wolf "W") (string= cabbage "W") (string= goat "E"))
+  "farmer travels with the cabbage to the East side"
+  ((farmer "E") (cabbage "E")))
+
+ ("Farmer, wolf, and cabbage are on the East side and goat is on West side"
+  (and (string= farmer "E") (string= wolf "E") (string= cabbage "E") (string= goat "W"))
+  "farmer travels with the cababge to the West side"
+  ((farmer "W") (cabbage "W")))
+
+ ;;
 
  ("Farmer and goat are on the West side, wolf and cabbage are on the East side"
   (and (string= farmer "W") (string= goat "W") (string= wolf "E")  (string= cabbage "E"))
@@ -78,9 +110,4 @@
   (and (string= farmer "E") (string= goat "E") (string= wolf "W")  (string= cabbage "W"))
   "farmer travels alone to the West side"
   ((farmer "W")))
-
- ("Farmer and goat are on the West side, wolf and cabbage are on the East side"
-  (and (string= farmer "W") (string= goat "W") (string= wolf "E")  (string= cabbage "E"))
-  "farmer travels alone to the East side"
-  ((farmer "E")))
 )

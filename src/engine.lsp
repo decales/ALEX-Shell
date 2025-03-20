@@ -1,49 +1,56 @@
 (in-package alex-shell)
 
+
+(defvar solutions nil)
+
+
 (defun startEngine()
+  ;;solve problem using depth first state search, then print solutions if any
+  (setf solutions nil)
   (solveDFS `((,initialState nil nil)))
+  (msgSolutions)
 )
 
-
 ;; solve problem instance using depth first search
-;; nodes as lists (<state> <condition-semantics> <action-semantics>)
+;; nodes represented as lists (<state> <condition-semantics> <action-semantics>)
 (defun solveDFS (visitedNodes)
+  
   ;; retrieve the current state from the top of the visited stack
   (let ((state (car (car visitedNodes))))
 
     ;; check if the current state is goal state
     (when (stateEquals state goalState)
-      (print "done")
+      ;; add solution path to list of solutions
+      (setf solutions (cons visitedNodes solutions))
       (return-from solveDFS)
     )
+    ;; in non-solution state, try match state/knowledge to each production rule
+    (loop for production in productionRules do
+      (let ((condition-semantics (nth 0 production))
+            (condition (nth 1 production))
+            (action-semantics (nth 2 production))
+            (action (nth 3 production)))
 
-    ;; macro to declare state properties as local variables
-    ;; (letStateProperties state
-    ;;   ;; try match state/knowledge to each production rule
-    ;;   (loop for production in productionRules do
-    ;;     (let ((condition-semantics (nth 0 production))
-    ;;           (condition (nth 1 production))
-    ;;           (action-semantics (nth 2 production))
-    ;;           (action (nth 3 production)))
-    ;;
-    ;;       ;; check if a production fires in the current state
-    ;;       (print condition)
-    ;;       (if (eval `,condition) ;; evaluates using locally scoped property variables 
-    ;;         (let ((updatedState (getUpdatedState state action))) ;; get updated state given the action of the production
-    ;;
-    ;;           (print updatedState)
-    ;;
-    ;;           ;; check if the updated state is unvisited,
-    ;;           (unless (isVisited (mapcar #'car visitedNodes) updatedState)
-    ;;             ;; create node with updated state and condition/action semantics, then add it to the visited stack and traverse to it
-    ;;             (solveDFS (cons `(,updatedState ,condition-semantics ,action-semantics) (copy-tree visitedNodes)))
-    ;;           )
-    ;;         )
-    ;;         (format t "no ")
-    ;;       )
-    ;;     )
-    ;;   )
-    ;; )
+        ;; create dynamically scoped variables for each property of the current state, then match them to production rules
+        ;; vars are dynamic in that they are bound in the let block scope, but 'special' declaration allows them to be used with (eval) outside of it
+        ;; this language is simulatenously crazy and amazing, but this was a nightmare to figure out
+        (eval `(let ,state 
+          (declare (special ,@(mapcar #'first state)))
+
+          ;; check if rule fires - conditions are expanded and evaluated using the dynamic variables
+          (when ,condition  
+            ;; get updated state given the action of the production
+            (let ((updatedState (getUpdatedState ',state ',action))) 
+              ;; ;; check if the updated state is unvisited,
+              (unless (isVisited (mapcar #'car ',visitedNodes) updatedState)
+                ;; create node with updated state and condition/action semantics, then add it to the visited stack and traverse to it
+                (solveDFS (cons (list updatedState ,condition-semantics ,action-semantics) ',visitedNodes))
+              )
+            )
+          )
+        ))
+      )
+    )
   )
 )
 
@@ -77,7 +84,7 @@
   ;; apply each property update from the action to the state
   (let ((updatedState (copy-tree state)))
     (loop for property in action do
-      (let ((name (nth 0 property)) (value (nth 1 property)))
+      (let ((name (nth 0 property)) (value (getValue (nth 1 property)))) ;; getValue from parse.lsp
         (setf (nth 1 (assoc name updatedState)) value)
       )
     )
@@ -86,7 +93,7 @@
 )
 
 
-;; helper functions to simplify condition expressions in knowledge base files
+;; helper functions to simplify expressions in knowledge base files
 (defun xor (p q)
   (or (and p (not q)) (and q (not p)))
 )

@@ -1,7 +1,7 @@
 (in-package alex-shell)
 
-;; global shell variables
 (defvar shellRunning t)
+
 
 (defun msgPrompt()
   (format t "~%(alexsh)$ ")
@@ -48,15 +48,23 @@
 )
 
 
+(defun msgSolutions()
+  (if solutions ;; from engine.lsp
+    (print solutions)
+    (msg 'info nil "no solutions found")
+  )
+)
+
+
 (defun msg(leader input str &rest vars)
   (if leader
     (if input
-      (format t "(~a): ~a~%~2Tinput: ~s~%~%" (string-downcase leader) (eval `(format nil ,str ,@vars)) input)
-      (format t "(~a): ~a~%~%" (string-downcase leader) (eval `(format nil ,str ,@vars)))
+      (format t "(~a): ~a~%~2Tinput: ~s~%" (string-downcase leader) (eval `(format nil ,str ,@vars)) input)
+      (format t "(~a): ~a~%" (string-downcase leader) (eval `(format nil ,str ,@vars)))
     )
     (if input
-      (format t "~a~%~2Tinput: ~s~%~%" (eval `(format nil ,str ,@vars)) input)
-      (format t "~a~%~%" (eval `(format nil ,str ,@vars)))
+      (format t "~a~%~2Tinput: ~s~%" (eval `(format nil ,str ,@vars)) input)
+      (format t "~a~%" (eval `(format nil ,str ,@vars)))
     )
   )
   (when (equal leader 'error)
@@ -101,7 +109,7 @@
               ;; check if knowledge-base is already loaded
               (if knowledgeBaseLoaded
                 (progn
-                  (msg 'warning nil "a knowledge-base file is already loaded - do you want to override this file with the current input? (y/n) ")
+                  (msg 'warning nil "a knowledge-base is already loaded - do you want to override the knowledge-base with the current input? (y/n) ")
                   (msgPrompt)
                   (let ((response (read-line)))
                     (cond
@@ -149,16 +157,13 @@
 
 
 (defun startShell()
-  (readFile "fp.lsp")
-  (when knowledgeBaseLoaded (startEngine))
+  (msgAbout)
+  (msgCommands)
 
-  ;; (msgAbout)
-  ;; (msgCommands)
-  ;;
-  ;; (loop while shellRunning do
-  ;;   (msgPrompt)
-  ;;   (let ((tokens (getTokens)))
-  ;;     (getCommand tokens)
-  ;;   )
-  ;; )
+  (loop while shellRunning do
+    (msgPrompt)
+    (let ((tokens (getTokens)))
+      (getCommand tokens)
+    )
+  )
 )
