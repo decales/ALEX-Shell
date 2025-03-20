@@ -15,6 +15,7 @@
 
 (defun parseExpressions(read-expressions)
   (reset) ;; reset bound property variables and parameters on call
+
   
   (parseStateDefinition (nth 0 read-expressions))                   ;; expression #1 - state definition property declarations
   (parseStates (nth 1 read-expressions) (nth 2 read-expressions))   ;; expressions #2 and #3 - initial and goal state values
@@ -34,6 +35,7 @@
 
 
 (defun parseStateDefinition(read-stateDefinition)
+  (msg 'debug nil "parsing state definition...")
   ;; check if state definition is formatted as list
   (if (typep read-stateDefinition 'list)
     ;; check if state definition list is not empty
@@ -88,6 +90,7 @@
 
 
 (defun parseState(read-state state stateString)
+  (msg 'debug nil "parsing ~a..." stateString)
   ;; check if state is formatted as list
   (if (typep read-state 'list)
     ;; check validity of each property
@@ -135,6 +138,7 @@
 (defun parseProductionRules(read-productionRules)
   ;; don't parse production rules until previous parameters parsed successfully (for less convoluted error log)
   (unless errorsDetected
+    (msg 'debug nil "parsing production rules...")
     ;; check if production rules is a list
     (if (typep read-productionRules 'list)
       ;; check if production rules list is not empty

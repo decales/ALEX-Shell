@@ -8,6 +8,7 @@
   ;; check if the file exists
   (if (probe-file file)
     (progn
+      (msg 'debug nil "reading file...")
       (setf lastFileInputted file) ;; remember the name of the file that was inputted
       (handler-case
         ;; read each expression from the inputted file into a list then pass list of expressions to parser 
