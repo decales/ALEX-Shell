@@ -50,11 +50,18 @@
 
 (defun msg(leader input str &rest vars)
   (if leader
-    (format t "(~a): ~a~%" (string-downcase leader) (eval `(format nil ,str ,@vars)))
-    (format t "~a~%" (eval `(format nil ,str ,@vars)))
+    (if input
+      (format t "(~a): ~a~%~2Tinput: ~s~%~%" (string-downcase leader) (eval `(format nil ,str ,@vars)) input)
+      (format t "(~a): ~a~%~%" (string-downcase leader) (eval `(format nil ,str ,@vars)))
+    )
+    (if input
+      (format t "~a~%~2Tinput: ~s~%~%" (eval `(format nil ,str ,@vars)) input)
+      (format t "~a~%~%" (eval `(format nil ,str ,@vars)))
+    )
   )
-  (when input (format t "~2Tinput: ~s~%~%" input))
-  (setf errorsDetected t)
+  (when (equal leader 'error)
+    (setf errorsDetected t)
+  )
 )
 
 

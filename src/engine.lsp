@@ -5,16 +5,11 @@
 )
 
 
-
-
 ;; solve problem instance using depth first search
 ;; nodes as lists (<state> <condition-semantics> <action-semantics>)
-
 (defun solveDFS (visitedNodes)
   ;; retrieve the current state from the top of the visited stack
   (let ((state (car (car visitedNodes))))
-
-    (format t "~%~%~%state~%~s~%body" visitedNodes)
 
     ;; check if the current state is goal state
     (when (stateEquals state goalState)
@@ -23,37 +18,32 @@
     )
 
     ;; macro to declare state properties as local variables
-    (print(macroexpand-1 `(letStateProperties ,state)))
-
-    (format t "~%exec")
-
-    ;; macro to declare state properties as local variables
-    (letStateProperties state
-      ;; try match state/knowledge to each production rule
-      (loop for production in productionRules do
-        (let ((condition-semantics (nth 0 production))
-              (condition (nth 1 production))
-              (action-semantics (nth 2 production))
-              (action (nth 3 production)))
-
-          ;; check if a production fires in the current state
-          (print condition)
-          (if (eval `,condition) ;; evaluates using locally scoped property variables 
-            (let ((updatedState (getUpdatedState state action))) ;; get updated state given the action of the production
-
-              (print updatedState)
-
-              ;; check if the updated state is unvisited,
-              (unless (isVisited (mapcar #'car visitedNodes) updatedState)
-                ;; create node with updated state and condition/action semantics, then add it to the visited stack and traverse to it
-                (solveDFS (cons `(,updatedState ,condition-semantics ,action-semantics) (copy-tree visitedNodes)))
-              )
-            )
-            (format t "no ")
-          )
-        )
-      )
-    )
+    ;; (letStateProperties state
+    ;;   ;; try match state/knowledge to each production rule
+    ;;   (loop for production in productionRules do
+    ;;     (let ((condition-semantics (nth 0 production))
+    ;;           (condition (nth 1 production))
+    ;;           (action-semantics (nth 2 production))
+    ;;           (action (nth 3 production)))
+    ;;
+    ;;       ;; check if a production fires in the current state
+    ;;       (print condition)
+    ;;       (if (eval `,condition) ;; evaluates using locally scoped property variables 
+    ;;         (let ((updatedState (getUpdatedState state action))) ;; get updated state given the action of the production
+    ;;
+    ;;           (print updatedState)
+    ;;
+    ;;           ;; check if the updated state is unvisited,
+    ;;           (unless (isVisited (mapcar #'car visitedNodes) updatedState)
+    ;;             ;; create node with updated state and condition/action semantics, then add it to the visited stack and traverse to it
+    ;;             (solveDFS (cons `(,updatedState ,condition-semantics ,action-semantics) (copy-tree visitedNodes)))
+    ;;           )
+    ;;         )
+    ;;         (format t "no ")
+    ;;       )
+    ;;     )
+    ;;   )
+    ;; )
   )
 )
 
@@ -96,16 +86,11 @@
 )
 
 
-;; create a let block given a list of state property variables
-(defmacro letStateProperties (state &body body)
-  `(let ,state ,@body)
-)
-
-
 ;; helper functions to simplify condition expressions in knowledge base files
 (defun xor (p q)
   (or (and p (not q)) (and q (not p)))
 )
+
 
 (defun xand (&rest args)
   (loop for i below (- (length args) 1) do
