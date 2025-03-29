@@ -1,6 +1,6 @@
 # ALEX - *A Lisp Expert System Shell*
 
-ALEX is a universal data-driven [expert system](https//www.en.wikipedia.org/wiki/Expert_system) shell designed to solve problems that can be
+ALEX is a universal data-driven [expert system](https://en.wikipedia.org/wiki/Expert_system) shell designed to solve problems that can be
 represented as state sequences with simple state transition logic. The system was developed in
 Common Lisp, hence its name, and accepts Lisp-based knowledge-base files as input to specify the
 problems to be solved. Given the flexibility of its knowledge base format and the powerful utility of the
@@ -66,7 +66,7 @@ knowledge-base are safe to evaluate.
 
 In addition to providing detailed guidance on how to correctly construct a knowledge-base file, the two
 example files highlight the flexibility of how a problem instance can be represented. Both files describe
-the logic of the [wolf, goat, and cabbage problem](https://www.en.wikipedia.org/wiki/Wolf%2C_goat_and_cabbage_problem), though in slightly different approaches. The first
+the logic of the [wolf, goat, and cabbage problem](https://en.wikipedia.org/wiki/Wolf,_goat_and_cabbage_problem), though in slightly different approaches. The first
 example, *examples/fp1.lsp*, represents the state by defining boolean properties for all four entities of the
 problem, where the value of a property represents the side of the river an entity is on in a given state.
 Because properties are represented as booleans, the actions of their productions rules simply update the
