@@ -1,4 +1,4 @@
-# ALEX – *A Lisp Expert System Shell*
+## ALEX – *A Lisp Expert System Shell*
 
 ALEX is a universal data-driven [expert system](https://en.wikipedia.org/wiki/Expert_system) shell designed to solve problems that can be
 represented as state sequences with simple state transition logic. The system was developed in
